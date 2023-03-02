@@ -1,5 +1,6 @@
 [package]
 name = "tokio-sunspec"
+description = "Tokio-based SunSpec library"
 version = "0.1.0"
 edition = "2021"
 authors = ["Lukas Kirner <lukas.kirner@gmail.com>"]
