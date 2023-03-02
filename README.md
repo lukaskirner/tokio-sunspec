@@ -4,6 +4,9 @@ A pure [Rust](https://www.rust-lang.org)
 [SunSpec](https://en.wikipedia.org/wiki/SunSpec) library
 based on [tokio](https://tokio.rs).
 
+[![Crates.io](https://img.shields.io/crates/v/tokio-sunspec.svg)](https://crates.io/crates/tokio-sunspec)
+[![Apache 2.0 licensed](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](./LICENSE)
+
 ## Features
 
 ## Installation
