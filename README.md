@@ -14,8 +14,8 @@ based on [tokio](https://tokio.rs).
 - [x] TCP Client
 - [x] Model discovery
 - [x] Type safe SunSpec models
-- [] Repeating models
-- [] RTU Client
+- [ ] Repeating models
+- [ ] RTU Client
 
 ## Installation
 
