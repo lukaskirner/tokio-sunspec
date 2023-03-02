@@ -1,0 +1,2 @@
+{% for model in models %}pub mod model{{ model }};
+{% endfor %}

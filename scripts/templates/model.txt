@@ -1,0 +1,13 @@
+#![allow(non_upper_case_globals)]
+use crate::model::Model;
+use crate::point::Point;
+
+pub struct Model{{ id }} {}
+
+impl Model for Model{{ id }} {
+    const ID: u16 = {{ id }};
+    const LENGTH: u16 = {{ length }};
+}
+
+{% for point in points %}pub const {{ point.id }}: Point<Model{{ id }}, {{ point.type }}> = Point::new({{ point.offset }}, {{ point.length }}, {{ point.write_access }});
+{% endfor %}
