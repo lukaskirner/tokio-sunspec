@@ -27,3 +27,13 @@ let mut client = tokio_sunspec::connect_tcp(socket_addr, device_id, start_addr).
 let res = client.read_point(model1::Mn).await?;
 assert_eq!(res, "SMA");
 ```
+
+## Protocol-Specification
+
+- [SunSpec Information Model Specification (PDF)](https://sunspec.org/wp-content/uploads/2015/06/SunSpec-Information-Models-12041.pdf)
+
+## License
+
+Copyright (c) 2023 Lukas Kirner
+
+[Apache-2.0](LICENSE.md)
