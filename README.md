@@ -9,6 +9,14 @@ based on [tokio](https://tokio.rs).
 
 ## Features
 
+- [x] Pure Rust library
+- [x] Non-blocking
+- [x] TCP Client
+- [x] Model discovery
+- [x] Type safe SunSpec models
+- [] Repeating models
+- [] RTU Client
+
 ## Installation
 
 ```toml
@@ -18,7 +26,9 @@ tokio-sunspec = "*"
 
 ## Examples
 
-#### TCP Connect example for SMA Inverter
+The `src/models/` folder contains all pre generated models which may be available by the device. If you need to add your own model you can generate one with included Python script in the `scripts` folder.
+
+### TCP Connect example for SMA Inverter
 
 ```rust
 let socket_addr = "<ip-address>:502".parse().unwrap();
@@ -34,6 +44,10 @@ assert_eq!(res, "SMA");
 ## Protocol-Specification
 
 - [SunSpec Information Model Specification (PDF)](https://sunspec.org/wp-content/uploads/2015/06/SunSpec-Information-Models-12041.pdf)
+
+## Fruther notice
+
+This lib only implements the SunSpec part. The connection via modbus is done by the [tokio-modbus](https://github.com/slowtec/tokio-modbus) lib.
 
 ## License
 
