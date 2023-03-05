@@ -21,22 +21,23 @@ impl<T: Model, K: PointType<K>> Point<T, K> {
     }
 }
 
+fn to_be_bytes(data: Vec<u16>) -> Vec<u8> {
+    return data
+        .iter()
+        .flat_map(|v| v.to_be_bytes())
+        .collect::<Vec<u8>>();
+}
+
 pub trait PointType<T> {
     fn convert_to(data: Vec<u16>) -> T; // TODO: use Result<T, Error>
 }
 
 impl PointType<String> for String {
     fn convert_to(data: Vec<u16>) -> String {
-        let bytes: Vec<u8> = data.iter().flat_map(|v| v.to_be_bytes()).collect();
-        return String::from_utf8(bytes).unwrap();
+        let bytes: Vec<u8> = to_be_bytes(data).try_into().unwrap();
+        let fbytes: Vec<u8> = bytes.iter().filter(|b| **b != 0).map(|b| *b).collect();
+        return String::from_utf8(fbytes).unwrap();
     }
-}
-
-fn to_be_bytes(data: Vec<u16>) -> Vec<u8> {
-    return data
-        .iter()
-        .flat_map(|v| v.to_be_bytes())
-        .collect::<Vec<u8>>();
 }
 
 impl PointType<i16> for i16 {
