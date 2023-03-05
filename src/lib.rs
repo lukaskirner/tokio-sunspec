@@ -3,6 +3,7 @@ pub mod model;
 pub mod models;
 pub mod point;
 pub mod types;
+pub mod utils;
 
 use error::Error;
 use model::Model;
