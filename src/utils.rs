@@ -10,9 +10,17 @@ pub(crate) fn to_be_bytes(data: Vec<u16>) -> Vec<u8> {
 }
 
 pub(crate) fn to_u16_vector(data: &[u8]) -> Vec<u16> {
-    return data
-        .chunks_exact(2)
+    let chunks = data.chunks_exact(2);
+    let remainder = chunks.remainder();
+
+    let mut result: Vec<u16> = chunks
         .into_iter()
         .map(|a| u16::from_be_bytes([a[0], a[1]]))
         .collect();
+
+    if remainder.len() > 0 {
+        result.push(u16::from_be_bytes([remainder[0], 0]));
+    }
+
+    return result;
 }
