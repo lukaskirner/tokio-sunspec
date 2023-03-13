@@ -12,6 +12,6 @@ repository = "https://github.com/lukaskirner/tokio-sunspec"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-tokio = { version = "1.21.2", features = ["full"] }
-tokio-modbus = { version = "0.6", default-features = false, features = ["tcp", "server", "tcp-server-unstable"] }
-thiserror = "1.0.38"
+tokio = { version = "1.26.0", features = ["full"] }
+tokio-modbus = { version = "0.7", default-features = false, features = ["tcp", "server", "tcp-server-unstable"] }
+thiserror = "1.0.39"
