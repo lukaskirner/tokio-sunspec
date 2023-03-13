@@ -13,9 +13,6 @@ use tokio_modbus::{client::Context, prelude::*};
 use types::Address;
 
 pub struct Client {
-    /// Connection string/address
-    pub socket_addr: SocketAddr,
-
     /// Slave Id of device
     pub slave_id: u8,
 
@@ -34,27 +31,21 @@ pub async fn connect_tcp(
     slave_id: u8,
     start_address: Address,
 ) -> Result<Client, Error> {
-    println!("Connecting SunSpec client ...");
-    let context = tcp::connect_slave(socket_addr, Slave(slave_id)).await;
-    if context.is_err() {
-        return Err(Error::Io(context.err().unwrap()));
-    }
-
-    println!("SunSpec client connected to `{}`.", socket_addr);
+    let context = tcp::connect_slave(socket_addr, Slave(slave_id)).await?;
+    
     let mut client = Client {
-        socket_addr,
         slave_id,
         start_address,
         models: HashMap::new(),
-        modbus_client: context.unwrap(),
+        modbus_client: context,
     };
 
-    println!("SunSpec checking for compatability ...");
     let supported_models = client.model_discovery().await?;
     client.models = supported_models;
 
     return Ok(client);
 }
+
 
 impl Client {
     /// Discover the supported models of the connected device.
@@ -84,7 +75,7 @@ impl Client {
             }
             supported_models.insert(model_id, base_addr + 2);
 
-            base_addr += 2; // increase by two register which we were reading eralier
+            base_addr += 2; // increase by two register which we were reading earlier
             base_addr += model_length; // increase by length of model to get to next model
         }
     }
