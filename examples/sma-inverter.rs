@@ -2,8 +2,8 @@ use tokio_sunspec::error::Error;
 use tokio_sunspec::models::{model1, model120};
 use tokio_sunspec::utils;
 
-#[tokio::test]
-async fn sma_inverter_test() -> Result<(), Error> {
+#[tokio::main(flavor = "current_thread")]
+async fn main() -> Result<(), Error> {
     let socket_addr = "192.168.178.99:502".parse().unwrap();
     let slave_id: u8 = 126;
     let start_addr: u16 = 40000;
