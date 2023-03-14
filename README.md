@@ -12,10 +12,10 @@ based on [tokio](https://tokio.rs).
 - [x] Pure Rust library
 - [x] Non-blocking
 - [x] TCP Client
+- [x] RTU Client
 - [x] Model discovery
 - [x] Type safe SunSpec models
 - [ ] Repeating models
-- [ ] RTU Client
 
 ## Installation
 

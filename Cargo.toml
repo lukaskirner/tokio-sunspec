@@ -13,7 +13,8 @@ repository = "https://github.com/lukaskirner/tokio-sunspec"
 
 [dependencies]
 tokio = { version = "1.21.2", features = ["full"] }
-tokio-modbus = { version = "0.6", default-features = false, features = ["tcp", "server", "tcp-server-unstable"] }
+tokio-serial = "5.4.1"
+tokio-modbus = { version = "0.6", default-features = false, features = ["tcp", "rtu", "server", "tcp-server-unstable"] }
 thiserror = "1.0.38"
 
 
