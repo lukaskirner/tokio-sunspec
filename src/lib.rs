@@ -97,6 +97,19 @@ impl Client {
             .await
             .map_err(Error::Io);
     }
+
+    /// Easy access to modbus `write_multiple_registers`.
+    async fn write_holding_registers(
+        &mut self,
+        addr: Address,
+        data: Vec<u16>,
+    ) -> Result<(), Error> {
+        return self
+            .modbus_client
+            .write_multiple_registers(addr, &data)
+            .await
+            .map_err(Error::Io);
+    }
 }
 
 impl Client {
@@ -108,11 +121,28 @@ impl Client {
         if let Some(model_addr) = self.models.get(&T::ID) {
             let address = *model_addr + point.offset;
             return self
-                .modbus_client
                 .read_holding_registers(address, point.length)
                 .await
-                .and_then(|res| Ok(K::convert_to(res)))
-                .map_err(Error::Io);
+                .and_then(|res| Ok(K::decode(res)));
+        }
+
+        return Err(Error::UnsupportedModel(T::ID));
+    }
+
+    /// Write data to the given point
+    pub async fn write_point<T: Model, K: PointType<K>>(
+        &mut self,
+        point: Point<T, K>,
+        data: K,
+    ) -> Result<(), Error> {
+        if !point.write_access {
+            return Err(Error::WriteNotSupported());
+        }
+
+        if let Some(model_addr) = self.models.get(&T::ID) {
+            let address = *model_addr + point.offset;
+            let buff = K::encode(data);
+            return self.write_holding_registers(address, buff).await;
         }
 
         return Err(Error::UnsupportedModel(T::ID));
