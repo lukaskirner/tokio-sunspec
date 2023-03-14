@@ -33,17 +33,16 @@ pub async fn connect_tcp(
     start_address: Address,
 ) -> Result<Client, Error> {
     println!("Connecting SunSpec client ...");
-    let context = tcp::connect_slave(socket_addr, Slave(slave_id)).await;
-    if context.is_err() {
-        return Err(Error::Io(context.err().unwrap()));
-    }
+    let context = tcp::connect_slave(socket_addr, Slave(slave_id))
+        .await
+        .map_err(Error::Io)?;
 
     println!("SunSpec client connected to `{}`.", socket_addr);
     let mut client = Client {
         slave_id,
         start_address,
         models: HashMap::new(),
-        modbus_client: context.unwrap(),
+        modbus_client: context,
     };
 
     println!("SunSpec checking for compatability ...");
@@ -63,17 +62,16 @@ pub async fn connect_rtu(
     let builder = tokio_serial::new(device_path, baud_rate);
     let serial = SerialStream::open(&builder).unwrap();
 
-    let context = rtu::connect_slave(serial, Slave(slave_id)).await;
-    if context.is_err() {
-        return Err(Error::Io(context.err().unwrap()));
-    }
+    let context = rtu::connect_slave(serial, Slave(slave_id))
+        .await
+        .map_err(Error::Io)?;
 
     println!("SunSpec client connected to `{}`.", device_path);
     let mut client = Client {
         slave_id,
         start_address,
         models: HashMap::new(),
-        modbus_client: context.unwrap(),
+        modbus_client: context,
     };
 
     println!("SunSpec checking for compatability ...");
@@ -111,7 +109,7 @@ impl Client {
             }
             supported_models.insert(model_id, base_addr + 2);
 
-            base_addr += 2; // increase by two register which we were reading eralier
+            base_addr += 2; // increase by two register which we were reading earlier
             base_addr += model_length; // increase by length of model to get to next model
         }
     }
