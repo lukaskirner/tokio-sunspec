@@ -9,15 +9,23 @@ keywords = ["fieldbus", "sunspec", "modbus", "hardware", "automation"]
 homepage = "https://github.com/lukaskirner/tokio-sunspec"
 repository = "https://github.com/lukaskirner/tokio-sunspec"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[package.metadata.docs.rs]
+all-features = true
 
 [dependencies]
-tokio = { version = "1.21.2", features = ["full"] }
-tokio-serial = "5.4.1"
-tokio-modbus = { version = "0.6", default-features = false, features = ["tcp", "rtu", "server", "tcp-server-unstable"] }
 thiserror = "1.0.38"
+tokio-serial = { version = "5.4.4", optional = true, default-features = false }
+tokio-modbus = { version = "0.7.1", optional = true, default-features = false, features = ["tcp", "rtu", "server", "tcp-server-unstable"] }
 
+[dev-dependencies]
+tokio = { version = "1.26.0", features = ["time"] }
+
+[features]
+default = ["tcp", "rtu"]
+tcp = ["tokio-modbus/tcp"]
+rtu = ["tokio-modbus/rtu", "dep:tokio-serial"]
 
 [[examples]]
 name = "sma-inverter"
 path = "examples/sma-inverter.rs"
+required-features = ["tcp"]

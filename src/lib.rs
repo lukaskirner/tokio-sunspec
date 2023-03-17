@@ -27,6 +27,7 @@ pub struct Client {
     modbus_client: Context,
 }
 
+#[cfg(feature = "tcp")]
 pub async fn connect_tcp(
     socket_addr: SocketAddr,
     slave_id: u8,
@@ -39,6 +40,7 @@ pub async fn connect_tcp(
     return connect(modbus_client, slave_id, start_address).await;
 }
 
+#[cfg(feature = "rtu")]
 pub async fn connect_rtu(
     device_path: &str,
     baud_rate: u32,
