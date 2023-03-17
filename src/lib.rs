@@ -9,7 +9,6 @@ use error::Error;
 use model::Model;
 use point::{Point, PointType};
 use std::{collections::HashMap, net::SocketAddr};
-use tokio::sync::Mutex;
 use tokio_modbus::{client::Context, prelude::*};
 use tokio_serial::SerialStream;
 use types::Address;
@@ -25,7 +24,7 @@ pub struct Client {
     pub models: HashMap<u16, Address>,
 
     /// Modbus client
-    modbus_client: Mutex<Context>,
+    modbus_client: Context,
 }
 
 pub async fn connect_tcp(
@@ -33,7 +32,9 @@ pub async fn connect_tcp(
     slave_id: u8,
     start_address: Address,
 ) -> Result<Client, Error> {
-    let modbus_client = tcp::connect(socket_addr).await.map_err(Error::Io)?;
+    let modbus_client = tcp::connect_slave(socket_addr, Slave(slave_id))
+        .await
+        .map_err(Error::Io)?;
 
     return connect(modbus_client, slave_id, start_address).await;
 }
@@ -46,7 +47,9 @@ pub async fn connect_rtu(
 ) -> Result<Client, Error> {
     let builder = tokio_serial::new(device_path, baud_rate);
     let serial = SerialStream::open(&builder).unwrap();
-    let modbus_client = rtu::connect(serial).await.map_err(Error::Io)?;
+    let modbus_client = rtu::connect_slave(serial, Slave(slave_id))
+        .await
+        .map_err(Error::Io)?;
 
     return connect(modbus_client, slave_id, start_address).await;
 }
@@ -60,7 +63,7 @@ pub async fn connect(
         slave_id,
         start_address,
         models: HashMap::new(),
-        modbus_client: Mutex::new(client),
+        modbus_client: client,
     };
 
     client.model_discovery().await?;
@@ -101,10 +104,8 @@ impl Client {
 
     /// Easy access to modbus `read_holding_registers`.
     async fn read_holding_registers(&mut self, addr: Address, cnt: u16) -> Result<Vec<u16>, Error> {
-        let mut client = self.modbus_client.lock().await;
-        client.set_slave(Slave(self.slave_id));
-
-        return client
+        return self
+            .modbus_client
             .read_holding_registers(addr, cnt)
             .await
             .map_err(Error::Io);
@@ -116,10 +117,8 @@ impl Client {
         addr: Address,
         data: Vec<u16>,
     ) -> Result<(), Error> {
-        let mut client = self.modbus_client.lock().await;
-        client.set_slave(Slave(self.slave_id));
-
-        return client
+        return self
+            .modbus_client
             .write_multiple_registers(addr, &data)
             .await
             .map_err(Error::Io);
