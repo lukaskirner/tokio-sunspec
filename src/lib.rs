@@ -14,14 +14,14 @@ use tokio_serial::SerialStream;
 use types::Address;
 
 pub struct Client {
-    /// Slave Id of device
+    /// Slave Id of currently selected device
     pub slave_id: u8,
 
     /// Address where the sunspec models start
     pub start_address: Address,
 
     /// Contains all discovered models. Key = Model id, Value = Start address
-    pub models: HashMap<u16, Address>,
+    pub models: HashMap<u8, HashMap<u16, Address>>,
 
     /// Modbus client
     modbus_client: Context,
@@ -95,7 +95,12 @@ impl Client {
             if model_id == 0xFFFF || model_length == 0xFFFF {
                 return Ok(()); // Last model reached. We are done parsing.
             }
-            self.models.insert(model_id, base_addr + 2);
+
+            let models = self
+                .models
+                .entry(self.slave_id)
+                .or_insert_with(|| HashMap::new());
+            models.insert(model_id, base_addr + 2);
 
             base_addr += 2; // increase by two register which we were reading earlier
             base_addr += model_length; // increase by length of model to get to next model
@@ -131,7 +136,8 @@ impl Client {
         &mut self,
         point: Point<T, K>,
     ) -> Result<K, Error> {
-        if let Some(model_addr) = self.models.get(&T::ID) {
+        let model = self.models.get(&self.slave_id).unwrap();
+        if let Some(model_addr) = model.get(&T::ID) {
             let address = *model_addr + point.offset;
             return self
                 .read_holding_registers(address, point.length)
@@ -152,12 +158,28 @@ impl Client {
             return Err(Error::WriteNotSupported());
         }
 
-        if let Some(model_addr) = self.models.get(&T::ID) {
+        let model = self.models.get(&self.slave_id).unwrap();
+        if let Some(model_addr) = model.get(&T::ID) {
             let address = *model_addr + point.offset;
             let buff = K::encode(data);
             return self.write_holding_registers(address, buff).await;
         }
 
         return Err(Error::UnsupportedModel(T::ID));
+    }
+
+    /// Set a new slave_id, and do model discovery if it has not yet been done.
+    ///
+    /// This allows re-using a single connection (TCP or RTU) to use multiple
+    /// SunSpec devices on a single bus.
+    pub async fn set_slave(&mut self, slave_id: u8) -> Result<(), Error> {
+        self.slave_id = slave_id;
+        self.modbus_client.set_slave(Slave(slave_id));
+
+        if !self.models.contains_key(&slave_id) {
+            self.model_discovery().await?;
+        }
+
+        Ok(())
     }
 }

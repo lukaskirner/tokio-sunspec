@@ -24,7 +24,10 @@ async fn client_context(socket_addr: SocketAddr, s_id: u8, start_addr: u16) -> R
     // Connect client
     let mut client = tokio_sunspec::connect_tcp(socket_addr, s_id, start_addr).await?;
 
-    let mut model_ids = Vec::from_iter(client.models.keys().cloned());
+    let slave_ids = Vec::from_iter(client.models.keys().cloned());
+    assert_eq!(slave_ids, vec![s_id]);
+
+    let mut model_ids = Vec::from_iter(client.models.get(&s_id).unwrap().keys().cloned());
     model_ids.sort();
     assert_eq!(model_ids, vec![1]);
 
