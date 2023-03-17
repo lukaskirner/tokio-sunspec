@@ -9,6 +9,7 @@ use error::Error;
 use model::Model;
 use point::{Point, PointType};
 use std::{collections::HashMap, net::SocketAddr};
+use tokio::sync::Mutex;
 use tokio_modbus::{client::Context, prelude::*};
 use tokio_serial::SerialStream;
 use types::Address;
@@ -24,7 +25,7 @@ pub struct Client {
     pub models: HashMap<u16, Address>,
 
     /// Modbus client
-    modbus_client: Context,
+    modbus_client: Mutex<Context>,
 }
 
 pub async fn connect_tcp(
@@ -32,24 +33,9 @@ pub async fn connect_tcp(
     slave_id: u8,
     start_address: Address,
 ) -> Result<Client, Error> {
-    println!("Connecting SunSpec client ...");
-    let context = tcp::connect_slave(socket_addr, Slave(slave_id))
-        .await
-        .map_err(Error::Io)?;
+    let modbus_client = tcp::connect(socket_addr).await.map_err(Error::Io)?;
 
-    println!("SunSpec client connected to `{}`.", socket_addr);
-    let mut client = Client {
-        slave_id,
-        start_address,
-        models: HashMap::new(),
-        modbus_client: context,
-    };
-
-    println!("SunSpec checking for compatability ...");
-    let supported_models = client.model_discovery().await?;
-    client.models = supported_models;
-
-    return Ok(client);
+    return connect(modbus_client, slave_id, start_address).await;
 }
 
 pub async fn connect_rtu(
@@ -58,32 +44,32 @@ pub async fn connect_rtu(
     slave_id: u8,
     start_address: Address,
 ) -> Result<Client, Error> {
-    println!("Connecting SunSpec client ...");
     let builder = tokio_serial::new(device_path, baud_rate);
     let serial = SerialStream::open(&builder).unwrap();
+    let modbus_client = rtu::connect(serial).await.map_err(Error::Io)?;
 
-    let context = rtu::connect_slave(serial, Slave(slave_id))
-        .await
-        .map_err(Error::Io)?;
+    return connect(modbus_client, slave_id, start_address).await;
+}
 
-    println!("SunSpec client connected to `{}`.", device_path);
+pub async fn connect(
+    client: Context,
+    slave_id: u8,
+    start_address: Address,
+) -> Result<Client, Error> {
     let mut client = Client {
         slave_id,
         start_address,
         models: HashMap::new(),
-        modbus_client: context,
+        modbus_client: Mutex::new(client),
     };
 
-    println!("SunSpec checking for compatability ...");
-    let supported_models = client.model_discovery().await?;
-    client.models = supported_models;
-
+    client.model_discovery().await?;
     return Ok(client);
 }
 
 impl Client {
     /// Discover the supported models of the connected device.
-    async fn model_discovery(&mut self) -> Result<HashMap<u16, Address>, Error> {
+    async fn model_discovery(&mut self) -> Result<(), Error> {
         let mut base_addr = self.start_address;
 
         // Check for Sunspec identifier
@@ -98,16 +84,15 @@ impl Client {
         base_addr += 2;
 
         // Scan supported models
-        let mut supported_models = HashMap::new();
         loop {
             let res = self.read_holding_registers(base_addr, 2).await?;
             let model_id = res[0];
             let model_length = res[1];
 
             if model_id == 0xFFFF || model_length == 0xFFFF {
-                return Ok(supported_models); // Last model reached. We are done parsing.
+                return Ok(()); // Last model reached. We are done parsing.
             }
-            supported_models.insert(model_id, base_addr + 2);
+            self.models.insert(model_id, base_addr + 2);
 
             base_addr += 2; // increase by two register which we were reading earlier
             base_addr += model_length; // increase by length of model to get to next model
@@ -116,8 +101,10 @@ impl Client {
 
     /// Easy access to modbus `read_holding_registers`.
     async fn read_holding_registers(&mut self, addr: Address, cnt: u16) -> Result<Vec<u16>, Error> {
-        return self
-            .modbus_client
+        let mut client = self.modbus_client.lock().await;
+        client.set_slave(Slave(self.slave_id));
+
+        return client
             .read_holding_registers(addr, cnt)
             .await
             .map_err(Error::Io);
@@ -129,8 +116,10 @@ impl Client {
         addr: Address,
         data: Vec<u16>,
     ) -> Result<(), Error> {
-        return self
-            .modbus_client
+        let mut client = self.modbus_client.lock().await;
+        client.set_slave(Slave(self.slave_id));
+
+        return client
             .write_multiple_registers(addr, &data)
             .await
             .map_err(Error::Io);
