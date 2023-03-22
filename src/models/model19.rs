@@ -9,12 +9,12 @@ impl Model for Model19 {
     const LENGTH: u16 = 30;
 }
 
-pub const Nam: Point<Model19, String> = Point::new(0, 4, false);
-pub const Rte: Point<Model19, u32> = Point::new(4, 1, false);
-pub const Bits: Point<Model19, u16> = Point::new(6, 1, false);
-pub const Pty: Point<Model19, u16> = Point::new(7, 1, false);
-pub const Dup: Point<Model19, u16> = Point::new(8, 1, false);
-pub const Flw: Point<Model19, u16> = Point::new(9, 1, false);
+pub const Nam: Point<Model19, String> = Point::new(0, 4, true);
+pub const Rte: Point<Model19, u32> = Point::new(4, 1, true);
+pub const Bits: Point<Model19, u16> = Point::new(6, 1, true);
+pub const Pty: Point<Model19, u16> = Point::new(7, 1, true);
+pub const Dup: Point<Model19, u16> = Point::new(8, 1, true);
+pub const Flw: Point<Model19, u16> = Point::new(9, 1, true);
 pub const Auth: Point<Model19, u16> = Point::new(10, 1, false);
 pub const UsrNam: Point<Model19, String> = Point::new(11, 12, false);
 pub const Pw: Point<Model19, String> = Point::new(23, 6, false);

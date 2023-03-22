@@ -9,7 +9,7 @@ impl Model for Model15 {
     const LENGTH: u16 = 24;
 }
 
-pub const Clr: Point<Model15, u16> = Point::new(0, 1, false);
+pub const Clr: Point<Model15, u16> = Point::new(0, 1, true);
 pub const InCnt: Point<Model15, u32> = Point::new(1, 1, false);
 pub const InUcCnt: Point<Model15, u32> = Point::new(3, 1, false);
 pub const InNUcCnt: Point<Model15, u32> = Point::new(5, 1, false);

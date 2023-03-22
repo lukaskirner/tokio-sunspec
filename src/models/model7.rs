@@ -17,4 +17,4 @@ pub const Seq: Point<Model7, u16> = Point::new(5, 1, false);
 pub const Alm: Point<Model7, u16> = Point::new(6, 1, false);
 pub const Rsrvd: Point<Model7, u16> = Point::new(7, 1, false);
 pub const Alg: Point<Model7, u16> = Point::new(8, 1, false);
-pub const N: Point<Model7, u16> = Point::new(9, 1, false);
+pub const N: Point<Model7, u16> = Point::new(9, 1, true);
