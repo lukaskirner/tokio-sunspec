@@ -33,3 +33,4 @@ required-features = ["tcp"]
 [[example]]
 name = "meter"
 path = "examples/meter.rs"
+required-features = ["tcp"]
