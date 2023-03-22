@@ -14,5 +14,5 @@ pub const Md: Point<Model1, String> = Point::new(16, 16, false);
 pub const Opt: Point<Model1, String> = Point::new(32, 8, false);
 pub const Vr: Point<Model1, String> = Point::new(40, 8, false);
 pub const SN: Point<Model1, String> = Point::new(48, 16, false);
-pub const DA: Point<Model1, u16> = Point::new(64, 1, false);
+pub const DA: Point<Model1, u16> = Point::new(64, 1, true);
 pub const Pad: Point<Model1, u16> = Point::new(65, 1, false);
