@@ -9,7 +9,7 @@ impl Model for Model64001 {
     const LENGTH: u16 = 71;
 }
 
-pub const Cmd: Point<Model64001, u16> = Point::new(0, 1, false);
+pub const Cmd: Point<Model64001, u16> = Point::new(0, 1, true);
 pub const HWRev: Point<Model64001, u16> = Point::new(1, 1, false);
 pub const RSFWRev: Point<Model64001, u16> = Point::new(2, 1, false);
 pub const OSFWRev: Point<Model64001, u16> = Point::new(3, 1, false);

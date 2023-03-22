@@ -9,11 +9,11 @@ impl Model for Model129 {
     const LENGTH: u16 = 60;
 }
 
-pub const ActCrv: Point<Model129, u16> = Point::new(0, 1, false);
-pub const ModEna: Point<Model129, u16> = Point::new(1, 1, false);
-pub const WinTms: Point<Model129, u16> = Point::new(2, 1, false);
-pub const RvrtTms: Point<Model129, u16> = Point::new(3, 1, false);
-pub const RmpTms: Point<Model129, u16> = Point::new(4, 1, false);
+pub const ActCrv: Point<Model129, u16> = Point::new(0, 1, true);
+pub const ModEna: Point<Model129, u16> = Point::new(1, 1, true);
+pub const WinTms: Point<Model129, u16> = Point::new(2, 1, true);
+pub const RvrtTms: Point<Model129, u16> = Point::new(3, 1, true);
+pub const RmpTms: Point<Model129, u16> = Point::new(4, 1, true);
 pub const NCrv: Point<Model129, u16> = Point::new(5, 1, false);
 pub const NPt: Point<Model129, u16> = Point::new(6, 1, false);
 pub const Tms_SF: Point<Model129, u16> = Point::new(7, 1, false);

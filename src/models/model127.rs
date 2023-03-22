@@ -9,12 +9,12 @@ impl Model for Model127 {
     const LENGTH: u16 = 10;
 }
 
-pub const WGra: Point<Model127, u16> = Point::new(0, 1, false);
-pub const HzStr: Point<Model127, i16> = Point::new(1, 1, false);
-pub const HzStop: Point<Model127, i16> = Point::new(2, 1, false);
-pub const HysEna: Point<Model127, u16> = Point::new(3, 1, false);
-pub const ModEna: Point<Model127, u16> = Point::new(4, 1, false);
-pub const HzStopWGra: Point<Model127, u16> = Point::new(5, 1, false);
+pub const WGra: Point<Model127, u16> = Point::new(0, 1, true);
+pub const HzStr: Point<Model127, i16> = Point::new(1, 1, true);
+pub const HzStop: Point<Model127, i16> = Point::new(2, 1, true);
+pub const HysEna: Point<Model127, u16> = Point::new(3, 1, true);
+pub const ModEna: Point<Model127, u16> = Point::new(4, 1, true);
+pub const HzStopWGra: Point<Model127, u16> = Point::new(5, 1, true);
 pub const WGra_SF: Point<Model127, u16> = Point::new(6, 1, false);
 pub const HzStrStop_SF: Point<Model127, u16> = Point::new(7, 1, false);
 pub const RmpIncDec_SF: Point<Model127, u16> = Point::new(8, 1, false);

@@ -24,10 +24,10 @@ def generate_from_xml(path: str) -> int:
     for point in block.iterfind("point"):
         points.append({
             "id": point.attrib.get('id'),
-            "type": transform_type(point.attrib.get('type')),
+            "type": transform_type(point),
             "offset": point.attrib.get('offset'),
-            "length": point.attrib.get('len') or 1,
-            "write_access": "false"
+            "length": get_length(point),
+            "write_access": write_allowed(point)
         })
 
     model_id = model.attrib['id']
@@ -40,7 +40,8 @@ def generate_from_xml(path: str) -> int:
         return int(model_id)
 
 
-def transform_type(type: str) -> str:
+def transform_type(point: ET.Element) -> str:
+    type = point.attrib.get('type')
     match type:
         case "string": return "String"
         case "eui48": return "String"
@@ -73,6 +74,23 @@ def transform_type(type: str) -> str:
         case _:
             print(f'No matching transformer for type: {type}')
             return type
+
+
+def get_length(point: ET.Element) -> int:
+    len = point.attrib.get('len')
+
+    if len is None:
+        match point.attrib.get('type'):
+            case "float32": return 2
+            case _: return 1
+
+    return len
+
+
+def write_allowed(point: ET.Element) -> str:
+    if 'w' in (point.attrib.get('access') or 'r'):
+        return 'true'
+    return 'false'
 
 
 model_ids = []
