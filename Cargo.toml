@@ -25,7 +25,11 @@ default = ["tcp", "rtu"]
 tcp = ["tokio-modbus/tcp"]
 rtu = ["tokio-modbus/rtu", "dep:tokio-serial"]
 
-[[examples]]
+[[example]]
 name = "sma-inverter"
 path = "examples/sma-inverter.rs"
 required-features = ["tcp"]
+
+[[example]]
+name = "meter"
+path = "examples/meter.rs"
